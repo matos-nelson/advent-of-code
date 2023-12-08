@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class Main {
     public static void main (String [] args) {
@@ -62,7 +63,7 @@ public class Main {
                             break;
                         }
                     }
-                    
+
                     i = index;
                 }
             }
@@ -108,33 +109,63 @@ public class Main {
         }
 
         long minLocation = Long.MAX_VALUE;
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        List<Callable<Long>> tasks = new ArrayList<>();
         for(int k = 0; k < seeds.length; k+=2) {
 
+            long batchCnt = 0;
             for(long v = seeds[k]; v < seeds[k]+seeds[k+1]; v++) {
-                long seedValue = v;
+                final long seed = v;
+                tasks.add(() -> compute(seed, almanac));
 
-                for(List<String> map : almanac) {
-                    for(int n = 0; n < map.size(); n++) {
-                        String [] entries = map.get(n).split(" ");
-                        long [] ranges = new long[entries.length];
-
-                        for(int j = 0; j < entries.length; j++) {
-                            ranges[j] = Long.parseLong(entries[j]);
+                if (tasks.size() == 100) {
+                    try {
+                        List<Future<Long>> results = executorService.invokeAll(tasks);
+                        for(Future<Long> result : results) {
+                            Long resultValue = result.get();
+                            if(resultValue < minLocation) {
+                                minLocation = resultValue;
+                            }
                         }
-
-                        if(seedValue <= ranges[1] + ranges[2] - 1 && seedValue >= ranges[1]) {
-                            seedValue = Math.abs(seedValue - ranges[1] + ranges[0]);
-                            break;
-                        }
+                        tasks.clear();
+                        System.out.println("Computed Batch: " + batchCnt++);
+                    } catch (InterruptedException | ExecutionException e) {
+                        System.out.println("Something went wrong here...");
                     }
-                }
-
-                if(seedValue < minLocation) {
-                    minLocation = seedValue;
                 }
             }
         }
 
+        try {
+            executorService.shutdown();
+            if(!executorService.awaitTermination(-1, TimeUnit.MILLISECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Something went wrong here shut down...");
+        }
+        System.out.println("kjls");
         return minLocation;
+    }
+
+    public static long compute(Long seedValue, List<List<String>> almanac) {
+
+        for(List<String> map : almanac) {
+            for(int n = 0; n < map.size(); n++) {
+                String [] entries = map.get(n).split(" ");
+                long [] ranges = new long[entries.length];
+
+                for(int j = 0; j < entries.length; j++) {
+                    ranges[j] = Long.parseLong(entries[j]);
+                }
+
+                if(seedValue <= ranges[1] + ranges[2] - 1 && seedValue >= ranges[1]) {
+                    seedValue = Math.abs(seedValue - ranges[1] + ranges[0]);
+                    break;
+                }
+            }
+        }
+
+       return seedValue;
     }
 }
