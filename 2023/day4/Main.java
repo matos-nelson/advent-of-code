@@ -51,9 +51,7 @@ public class Main {
 
             int wins = getWins(inputs[i]) + 1;
             for(int j = gameCardNum + 1; j <= gameCardNum + wins; j++) {
-                //cards[j]++;
                 cards[j] += cards[gameCardNum];
-                //cards[j] *= cards[gameCardNum];
             }
             //System.out.println("Game: " + gameCardNum + " Win: " + wins);
             //System.out.println("Wins: " + wins);
