@@ -30,7 +30,33 @@ public class Main {
 
     public static int problem_p1(String [] inputs) {
         System.out.println("Part 1....");
-        return 0;
+        String directions = inputs[0];
+
+        HashMap<String, List<String>> map = new HashMap<>();
+        for(int i = 2; i < inputs.length; i++) {
+            String [] route = inputs[i].split(" = ");
+            String position = route[0];
+            String [] locations = route[1].replaceAll("\\(", "").replaceAll("\\)", "").split(", ");
+
+            map.put(position, Arrays.asList(locations));
+        }
+
+        String position = "AAA";
+        int index = 0;
+        int count = 0;
+
+        while(!position.equals("ZZZ")) {
+            int direction = directions.charAt(index) == 'L' ? 0 : 1;
+            position = map.get(position).get(direction);
+            //System.out.println("D: " + directions.charAt(index) + " P: " + position + " I: " + index);
+            index++;
+            count++;
+            if(index == directions.length()) {
+                index = 0;
+            }
+        }
+
+        return count;
     }
 
     public static int problem_p2(String [] inputs) {
