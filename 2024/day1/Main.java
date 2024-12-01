@@ -28,13 +28,54 @@ public class Main {
         System.out.println(problem_p2(arr));
     }
 
-    public static int problem_p1(String [] inputs) {
+    public static long problem_p1(String [] inputs) {
         System.out.println("Part 1....");
-        return 0;
+
+        int n = inputs.length;
+        long [] list1 = new long[n];
+        long [] list2 = new long[n];
+
+        for(int i = 0; i < n; i++) {
+            String [] digits = inputs[i].trim().replaceAll(" +", " ").split(" ");
+            list1[i] = Long.parseLong(digits[0]);
+            list2[i] = Long.parseLong(digits[1]);
+        }
+
+
+        Arrays.sort(list1);
+        Arrays.sort(list2);
+
+        long result = 0;
+        for(int i = 0; i < n; i++) {
+            result += Math.abs(list1[i] - list2[i]);
+        }
+
+        return result;
     }
 
-    public static int problem_p2(String [] inputs) {
+    public static long problem_p2(String [] inputs) {
         System.out.println("Part 2....");
-        return 0;
+        int n = inputs.length;
+        long [] list1 = new long[n];
+        long [] list2 = new long[n];
+
+        for(int i = 0; i < n; i++) {
+            String [] digits = inputs[i].trim().replaceAll(" +", " ").split(" ");
+            list1[i] = Long.parseLong(digits[0]);
+            list2[i] = Long.parseLong(digits[1]);
+        }
+
+        Map<Long, Long> map = new HashMap<>();
+        for(int i = 0; i < n; i++) {
+            map.put(list2[i], map.getOrDefault(list2[i], 0L) + 1);
+        }
+
+        long result = 0;
+        for(int i = 0; i < n; i++) {
+            long similarity = map.getOrDefault(list1[i], 0L);
+            result += similarity * list1[i];
+        }
+
+        return result;
     }
 }
