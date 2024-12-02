@@ -9,7 +9,8 @@ public class Main {
         List<String> lines = new ArrayList<String>();
 
         try {
-            reader = new BufferedReader(new FileReader("input.txt"));
+            reader = new BufferedReader(new FileReader("test_input.txt"));
+            //reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
 
             while (line != null) {
