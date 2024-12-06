@@ -29,13 +29,13 @@ public class Main {
         System.out.println(problem_p2(arr));
     }
 
-    public static int problem_p1(String [] inputs) {
+    public static long problem_p1(String [] inputs) {
         System.out.println("Part 1....");
-        return 0;
+        return 0L;
     }
 
-    public static int problem_p2(String [] inputs) {
+    public static long problem_p2(String [] inputs) {
         System.out.println("Part 2....");
-        return 0;
+        return 0L;
     }
 }
