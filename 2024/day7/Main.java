@@ -41,6 +41,10 @@ public class Main {
 
         sb.setCharAt(index, '*');
         permute(n, index + 1, sb, p);
+
+        // part 2 only
+        sb.setCharAt(index, '|');
+        permute(n, index + 1, sb, p);
     }
 
     public static boolean solve(List<String> operators, List<Long> operands, long solution) {
@@ -54,8 +58,10 @@ public class Main {
                 char op = operator.charAt(index++);
                 if(op == '*') {
                     result *= operands.get(i);
-                } else {
+                } else if(op == '+') {
                     result += operands.get(i);
+                } else if(op == '|') { // part 2 only
+                    result = Long.parseLong(result + "" + operands.get(i));
                 }
             }
 
