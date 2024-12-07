@@ -64,7 +64,7 @@ public class Main {
 
             long result = operands.get(0);
             int index = 0;
-            for(int i = 1; i < operands.size(); i++) {
+            for(int i = 1; i < operands.size() && result <= solution; i++) {
 
                 char op = operator.charAt(index++);
                 if(op == '*') {
@@ -72,7 +72,7 @@ public class Main {
                 } else if(op == '+') {
                     result += operands.get(i);
                 } else if(op == '|') { // part 2 only
-                    result = Long.parseLong(result + "" + operands.get(i));
+                    result = result * (long)Math.pow(10, (long)Math.log10(operands.get(i))+1) + operands.get(i);
                 }
             }
 
