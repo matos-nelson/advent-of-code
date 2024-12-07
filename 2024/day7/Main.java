@@ -9,8 +9,8 @@ public class Main {
         List<String> lines = new ArrayList<String>();
 
         try {
-            reader = new BufferedReader(new FileReader("test_input.txt"));
-            //reader = new BufferedReader(new FileReader("input.txt"));
+            //reader = new BufferedReader(new FileReader("test_input.txt"));
+            reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
 
             while (line != null) {
@@ -29,9 +29,73 @@ public class Main {
         System.out.println(problem_p2(arr));
     }
 
+    public static void permute(int n, int index, StringBuilder sb, List<String> p) {
+
+        if (index == n) {
+            p.add(sb.toString());
+            return;
+        }
+
+        sb.setCharAt(index, '+');
+        permute(n, index + 1, sb, p);
+
+        sb.setCharAt(index, '*');
+        permute(n, index + 1, sb, p);
+    }
+
+    public static boolean solve(List<String> operators, List<Long> operands, long solution) {
+
+        for(String operator : operators) {
+
+            long result = operands.get(0);
+            int index = 0;
+            for(int i = 1; i < operands.size(); i++) {
+
+                char op = operator.charAt(index++);
+                if(op == '*') {
+                    result *= operands.get(i);
+                } else {
+                    result += operands.get(i);
+                }
+            }
+
+            if(result == solution) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static long problem_p1(String [] inputs) {
         System.out.println("Part 1....");
-        return 0L;
+
+        long result = 0;
+        for(String input : inputs) {
+
+            String [] equations = input.split(":");
+            long solution = Long.parseLong(equations[0]);
+            List<Long> operands = new ArrayList<>();
+
+            for(String operand : equations[1].trim().split(" ")) {
+                operands.add(Long.parseLong(operand));
+            }
+
+            List<String> operators = new ArrayList<>();
+            StringBuilder sb = new StringBuilder();
+            int n = operands.size() - 1;
+            for(int i = 0; i < n; i++) {
+                sb.append('_');
+            }
+
+            permute(n, 0, sb, operators);
+            boolean isAbleToBeSolved = solve(operators, operands, solution);
+            if(isAbleToBeSolved) {
+                result += solution;
+            }
+        }
+
+        return result;
     }
 
     public static long problem_p2(String [] inputs) {
