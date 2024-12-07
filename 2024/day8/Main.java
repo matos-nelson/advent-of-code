@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.*;
 
 public class Main {
@@ -25,8 +26,18 @@ public class Main {
 
         String[] arr = new String[lines.size()];
         arr = lines.toArray(arr);
+
+        long startTime = System.nanoTime();
         System.out.println(problem_p1(arr));
+        long endTime = System.nanoTime();
+
+        System.out.println("P1 Time (s): " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + "\n");
+
+        startTime = System.nanoTime();
         System.out.println(problem_p2(arr));
+        endTime = System.nanoTime();
+
+        System.out.println("P2 Time (s): " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
     }
 
     public static long problem_p1(String [] inputs) {
