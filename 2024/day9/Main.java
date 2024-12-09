@@ -40,12 +40,8 @@ public class Main {
         System.out.println("P2 Time (s): " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
     }
 
-    public static long problem_p1(String [] inputs) {
-        System.out.println("Part 1....");
+    public static List<Long> buildBlocks(String input) {
 
-        String input = inputs[0];
-
-        StringBuilder sb = new StringBuilder();
         long blockId = 0;
         boolean isEmpty = false;
         List<Long> blocks = new ArrayList<>();
@@ -68,6 +64,16 @@ public class Main {
             }
         }
 
+        return blocks;
+    }
+
+    public static long problem_p1(String [] inputs) {
+        System.out.println("Part 1....");
+
+        String input = inputs[0];
+        List<Long> blocks = buildBlocks(input);
+
+        // fragment
         int left = 0;
         int right = blocks.size() - 1;
 
@@ -86,7 +92,7 @@ public class Main {
             blocks.set(right, temp);
         }
 
-        blockId = 0;
+        long blockId = 0;
         long result = 0;
         for(int i = 0; i < blocks.size(); i++) {
             if(blocks.get(i) == -1) {
@@ -102,6 +108,64 @@ public class Main {
 
     public static long problem_p2(String [] inputs) {
         System.out.println("Part 2....");
-        return 0L;
+
+        String input = inputs[0];
+        List<Long> blocks = buildBlocks(input);
+
+        // fragment
+        int right = blocks.size() - 1;
+        while(right > -1) {
+
+            while(right > -1 && blocks.get(right) == -1) {
+                right--;
+            }
+
+            int blockSize = 0;
+            long id = blocks.get(right);
+            while(right > -1 && blocks.get(right) == id) {
+                right--;
+                blockSize++;
+            }
+
+            int emptySize = 0;
+            int left = 0;
+            while(left < right && emptySize < blockSize) {
+
+                emptySize = 0;
+                while(left <= right && blocks.get(left) != -1) {
+                    left++;
+                }
+
+                while(left <= right && blocks.get(left) == -1) {
+                    left++;
+                    emptySize++;
+                }
+            }
+
+            if(emptySize < blockSize) {
+                continue;
+            }
+
+            int start = left - emptySize;
+            int end = right + blockSize;
+            while(start != left && end != right) {
+
+                long temp = blocks.get(start);
+                blocks.set(start, blocks.get(end));
+                blocks.set(end, temp);
+
+                start++;
+                end--;
+            }
+        }
+
+        long result = 0;
+        for(int i = 0; i < blocks.size(); i++) {
+            if(blocks.get(i) != -1) {
+                result += blocks.get(i) * i;
+            }
+        }
+
+        return result;
     }
 }
