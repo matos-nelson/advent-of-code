@@ -10,8 +10,8 @@ public class Main {
         List<String> lines = new ArrayList<String>();
 
         try {
-            reader = new BufferedReader(new FileReader("test_input.txt"));
-            //reader = new BufferedReader(new FileReader("input.txt"));
+            //reader = new BufferedReader(new FileReader("test_input.txt"));
+            reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
 
             while (line != null) {
@@ -42,7 +42,62 @@ public class Main {
 
     public static long problem_p1(String [] inputs) {
         System.out.println("Part 1....");
-        return 0L;
+
+        String input = inputs[0];
+
+        StringBuilder sb = new StringBuilder();
+        long blockId = 0;
+        boolean isEmpty = false;
+        List<Long> blocks = new ArrayList<>();
+        for(int i = 0; i < input.length(); i++) {
+
+            int blockSize = input.charAt(i) - '0';
+            for(int j = 0; j < blockSize; j++) {
+                if(isEmpty) {
+                    blocks.add(-1L);
+                } else {
+                    blocks.add(blockId);
+                }
+            }
+
+            if(!isEmpty) {
+                isEmpty = true;
+                blockId++;
+            } else {
+                isEmpty = false;
+            }
+        }
+
+        int left = 0;
+        int right = blocks.size() - 1;
+
+        while(left < right) {
+
+            while(left < right && left < blocks.size() && blocks.get(left) != -1) {
+                left++;
+            }
+
+            while(right > left && right > -1 && blocks.get(right) == -1) {
+                right--;
+            }
+
+            long temp = blocks.get(left);
+            blocks.set(left, blocks.get(right));
+            blocks.set(right, temp);
+        }
+
+        blockId = 0;
+        long result = 0;
+        for(int i = 0; i < blocks.size(); i++) {
+            if(blocks.get(i) == -1) {
+                break;
+            }
+
+            result += blockId * blocks.get(i);
+            blockId++;
+        }
+
+        return result;
     }
 
     public static long problem_p2(String [] inputs) {
