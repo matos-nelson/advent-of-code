@@ -40,9 +40,48 @@ public class Main {
         System.out.println("P2 Time (s): " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
     }
 
+    public static int maxDepthP1 = 25;
+    public static int maxDepthP2 = 75;
+    public static long compute(String stone, int depth, int maxDepth) {
+
+        if(depth == maxDepth) {
+            return 1;
+        }
+
+        if(stone.equals("0")) {
+            return compute("1", depth + 1, maxDepth);
+        }
+
+        if(stone.length() % 2 == 0) {
+            int length = stone.length();
+            String s1 = stone.substring(0, length/2);
+            String s2 = stone.substring(length/2, length);
+
+            s1 = Long.parseLong(s1) + "";
+            s2 = Long.parseLong(s2) + "";
+
+            return compute(s1, depth + 1, maxDepth) + compute(s2, depth + 1, maxDepth);
+        }
+
+        String newStone = Long.parseLong(stone) * 2024 + "";
+        return compute(newStone, depth + 1, maxDepth);
+    }
+
     public static long problem_p1(String [] inputs) {
         System.out.println("Part 1....");
-        return 0L;
+
+        String [] stones = inputs[0].trim().split(" ");
+        long totalStones = 0;
+        for(String stone : stones) {
+            long result = compute(stone, 0, maxDepthP1);
+            if(result == 0) {
+                totalStones++;
+            } else {
+                totalStones += result;
+            }
+        }
+
+        return totalStones;
     }
 
     public static long problem_p2(String [] inputs) {
