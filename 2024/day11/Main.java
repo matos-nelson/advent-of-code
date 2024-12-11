@@ -10,8 +10,8 @@ public class Main {
         List<String> lines = new ArrayList<String>();
 
         try {
-            reader = new BufferedReader(new FileReader("test_input.txt"));
-            //reader = new BufferedReader(new FileReader("input.txt"));
+            //reader = new BufferedReader(new FileReader("test_input.txt"));
+            reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
 
             while (line != null) {
@@ -42,14 +42,26 @@ public class Main {
 
     public static int maxDepthP1 = 25;
     public static int maxDepthP2 = 75;
+    public static Map<String, Map<Integer, Long>> map = new HashMap<>();
+
     public static long compute(String stone, int depth, int maxDepth) {
 
         if(depth == maxDepth) {
             return 1;
         }
 
+        if(map.containsKey(stone) && map.get(stone).containsKey(depth)) {
+            return map.get(stone).get(depth);
+        }
+
         if(stone.equals("0")) {
-            return compute("1", depth + 1, maxDepth);
+
+            long result = compute("1", depth + 1, maxDepth);
+            var cache = map.getOrDefault(stone, new HashMap<>());
+            cache.put(depth, result);
+
+            map.put(stone, cache);
+            return result;
         }
 
         if(stone.length() % 2 == 0) {
@@ -60,11 +72,23 @@ public class Main {
             s1 = Long.parseLong(s1) + "";
             s2 = Long.parseLong(s2) + "";
 
-            return compute(s1, depth + 1, maxDepth) + compute(s2, depth + 1, maxDepth);
+            long left = compute(s1, depth + 1, maxDepth);
+            long right = compute(s2, depth + 1, maxDepth);
+
+            var cache = map.getOrDefault(stone, new HashMap<>());
+            cache.put(depth, left+right);
+            map.put(stone, cache);
+
+            return left + right;
         }
 
         String newStone = Long.parseLong(stone) * 2024 + "";
-        return compute(newStone, depth + 1, maxDepth);
+        long result = compute(newStone, depth + 1, maxDepth);
+
+        var cache = map.getOrDefault(stone, new HashMap<>());
+        cache.put(depth, result);
+        map.put(stone, cache);
+        return result;
     }
 
     public static long problem_p1(String [] inputs) {
@@ -81,11 +105,25 @@ public class Main {
             }
         }
 
+        map = new HashMap<>();
         return totalStones;
     }
 
     public static long problem_p2(String [] inputs) {
         System.out.println("Part 2....");
-        return 0L;
+
+        String [] stones = inputs[0].trim().split(" ");
+        long totalStones = 0;
+        for(String stone : stones) {
+            long result = compute(stone, 0, maxDepthP2);
+            if(result == 0) {
+                totalStones++;
+            } else {
+                totalStones += result;
+            }
+        }
+
+        map = new HashMap<>();
+        return totalStones;
     }
 }
