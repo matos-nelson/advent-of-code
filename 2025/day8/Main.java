@@ -112,7 +112,6 @@ public class Main {
             points.add(new Point(i, x, y, z));
         }
 
-
         boolean [][] pairs = new boolean[n][n];
         PriorityQueue<PointPair> pq = new PriorityQueue<>(Comparator.comparing(PointPair::getDistance));
         for(int i = 0; i < n; i++) {
@@ -128,7 +127,11 @@ public class Main {
 
         int count = 0;
         int componentId = 0;
-        int limit = 1000;
+        // use below limit value for test input
+        int limit = 10;
+
+        // use below limit value for real input
+        // int limit = 1000;
         Map<Integer, Integer> componentToSize = new HashMap<>();
         Map<Integer, Integer> pointToComponent = new HashMap<>();
         while(count < limit && !pq.isEmpty()) {
@@ -186,6 +189,98 @@ public class Main {
 
     public static long problem_p2(String [] inputs) {
         System.out.println("Part 2....");
-        return 0L;
+
+        int n = inputs.length;
+        List<Point> points = new ArrayList<>();
+        for(int i = 0; i < n; i++) {
+
+            String [] point = inputs[i].split(",");
+            long x = Long.parseLong(point[0]);
+            long y = Long.parseLong(point[1]);
+            long z = Long.parseLong(point[2]);
+
+            points.add(new Point(i, x, y, z));
+        }
+
+        boolean [][] pairs = new boolean[n][n];
+        PriorityQueue<PointPair> pq = new PriorityQueue<>(Comparator.comparing(PointPair::getDistance));
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+
+                if(i != j && !pairs[i][j]) {
+                    pq.add(new PointPair(points.get(i), points.get(j)));
+                    pairs[i][j] = true;
+                    pairs[j][i] = true;
+                }
+            }
+        }
+
+        int componentId = 0;
+        Map<Integer, Integer> componentToSize = new HashMap<>();
+        Map<Integer, Integer> pointToComponent = new HashMap<>();
+        while(!pq.isEmpty()) {
+
+            PointPair pp = pq.poll();
+            int p1ComponentId = pointToComponent.getOrDefault(pp.a.id, -1);
+            int p2ComponentId = pointToComponent.getOrDefault(pp.b.id, -1);
+
+            if(p1ComponentId != -1 && p2ComponentId != -1 && p1ComponentId == p2ComponentId) {
+                // do nothing
+            } else if(p1ComponentId == -1 && p2ComponentId == -1) {
+                componentToSize.put(componentId, 2);
+
+                pointToComponent.put(pp.a.id, componentId);
+                pointToComponent.put(pp.b.id, componentId);
+                componentId++;
+            } else if(p1ComponentId != -1 && p2ComponentId == -1) {
+                int newSize = componentToSize.get(p1ComponentId) + 1;
+                componentToSize.put(p1ComponentId, newSize);
+                pointToComponent.put(pp.b.id, p1ComponentId);
+
+                if(newSize == n) {
+                    return pp.a.x * pp.b.x;
+                }
+
+            } else if(p1ComponentId == -1 && p2ComponentId != -1) {
+                int newSize = componentToSize.get(p2ComponentId) + 1;
+                componentToSize.put(p2ComponentId, componentToSize.get(p2ComponentId) + 1);
+                pointToComponent.put(pp.a.id, p2ComponentId);
+
+                if(newSize == n) {
+                    return pp.a.x * pp.b.x;
+                }
+
+            } else {
+
+                // merge
+                int targetComponentId = componentToSize.get(p1ComponentId) > componentToSize.get(p2ComponentId) ? p1ComponentId : p2ComponentId;
+                int filterComponentId = componentToSize.get(p1ComponentId) <= componentToSize.get(p2ComponentId) ? p1ComponentId : p2ComponentId;
+                List<Integer> pointIds = new ArrayList<>();
+                for(Map.Entry<Integer, Integer> entry : pointToComponent.entrySet()) {
+                    if(entry.getValue() == filterComponentId) {
+                        pointIds.add(entry.getKey());
+                    }
+                }
+
+                int freq = componentToSize.get(filterComponentId) - pointIds.size();
+                if(freq == 0) {
+                    componentToSize.remove(filterComponentId);
+                } else {
+                    componentToSize.put(filterComponentId, freq);
+                }
+
+                int newSize = componentToSize.get(targetComponentId) + pointIds.size();
+                componentToSize.put(targetComponentId, newSize);
+                for(int id : pointIds) {
+                    pointToComponent.put(id, targetComponentId);
+                }
+
+                if(newSize == n) {
+                    return pp.a.x * pp.b.x;
+                }
+            }
+        }
+
+        return -1L;
     }
 }
