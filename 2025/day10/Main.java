@@ -10,8 +10,8 @@ public class Main {
         List<String> lines = new ArrayList<String>();
 
         try {
-            //reader = new BufferedReader(new FileReader("test_input.txt"));
-            reader = new BufferedReader(new FileReader("input.txt"));
+            reader = new BufferedReader(new FileReader("test_input.txt"));
+            //reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
 
             while (line != null) {
@@ -81,6 +81,61 @@ public class Main {
         }
     }
 
+    static long bfs(List<List<Integer>> buttonPresses, List<Integer> targetVoltages) {
+
+        LinkedList<List<Integer>> queue = new LinkedList<>();
+        List<Integer> start = new ArrayList<>();
+        for(int i = 0; i < targetVoltages.size(); i++) {
+            start.add(0);
+        }
+
+        queue.add(start);
+        long min = Long.MAX_VALUE;
+        long count = 0;
+        while(!queue.isEmpty() && count < min) {
+
+            count++;
+            int size = queue.size();
+            for(int i = 0; i < size; i++) {
+
+                List<Integer> sequence = queue.poll();
+                boolean isTargetReached = true;
+                for(int j = 0; j < sequence.size() && isTargetReached; j++) {
+                    if(sequence.get(j) != targetVoltages.get(j)) {
+                        isTargetReached = false;
+                        break;
+                    }
+                }
+
+                if(isTargetReached) {
+                    min = Math.min(min, count);
+                    continue;
+                }
+
+                for(List<Integer> buttons : buttonPresses) {
+
+                    List<Integer> current = new ArrayList<>(sequence);
+                    boolean isValid = true;
+                    for(Integer button : buttons) {
+
+                        if(current.get(button) + 1 > targetVoltages.get(button)) {
+                            isValid = false;
+                            break;
+                        }
+
+                        current.set(button, current.get(button) + 1);
+                    }
+
+                    if(isValid) {
+                        queue.add(current);
+                    }
+                }
+            }
+        }
+
+        return min - 1;
+    }
+
     public static long problem_p1(String [] inputs) {
         System.out.println("Part 1....");
         long result = 0L;
@@ -114,6 +169,31 @@ public class Main {
 
     public static long problem_p2(String [] inputs) {
         System.out.println("Part 2....");
-        return 0L;
+        long result = 0L;
+        for(String input : inputs) {
+            String [] parts = input.split(" ");
+
+            String [] target = parts[parts.length - 1].replace("{", "").replace("}", "").split(",");
+            List<Integer> voltages = new ArrayList<>();
+            for(String targetVoltage : target) {
+                voltages.add(Integer.parseInt(targetVoltage));
+            }
+
+            List<List<Integer>> buttonPresses = new ArrayList<>();
+            for(int i = 1; i < parts.length - 1; i++) {
+                String [] buttons = parts[i].replace("(", "").replace(")", "").split(",");
+                List<Integer> sequence = new ArrayList<>();
+                for(String button : buttons) {
+                    sequence.add(Integer.parseInt(button));
+                }
+
+                buttonPresses.add(sequence);
+            }
+
+            long minPresses = bfs(buttonPresses, voltages);
+            result += minPresses;
+        }
+
+        return result;
     }
 }
